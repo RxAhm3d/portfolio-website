@@ -7,6 +7,7 @@ import { Label } from './ui/label';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner@2.0.3';
+import { trackChameleonEvent } from '../lib/chameleon';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -50,10 +51,14 @@ export function Contact() {
       // In a real application, you would send this data to a backend
       console.log('Form submitted:', formData);
       toast.success('Message sent successfully! I\'ll get back to you soon.');
+      trackChameleonEvent('contact_form_submitted', {
+        subject: formData.subject,
+      });
       setFormData({ name: '', email: '', subject: '', message: '' });
       setErrors({});
     } else {
       toast.error('Please fix the errors in the form');
+      trackChameleonEvent('contact_form_validation_failed');
     }
   };
 

@@ -2,6 +2,7 @@ import { Moon, Sun, Menu, X } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { Button } from './ui/button';
 import { useState, useEffect } from 'react';
+import { trackChameleonEvent } from '../lib/chameleon';
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
@@ -21,7 +22,14 @@ export function Header() {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
       setIsMenuOpen(false);
+      trackChameleonEvent('section_navigation_clicked', { section_id: id });
     }
+  };
+
+  const handleThemeToggle = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    toggleTheme();
+    trackChameleonEvent('theme_toggled', { theme: nextTheme });
   };
 
   const navItems = [
@@ -61,7 +69,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleTheme}
+              onClick={handleThemeToggle}
               aria-label="Toggle theme"
             >
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
@@ -73,7 +81,7 @@ export function Header() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleTheme}
+              onClick={handleThemeToggle}
               aria-label="Toggle theme"
             >
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
