@@ -2,6 +2,7 @@ import { Github, Linkedin, Mail, Download, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 import { motion } from 'motion/react';
 import CV from '../assets/Rechidi_Ahmed_Abdelaaziz_CV.pdf';
+import { trackChameleonEvent } from '../lib/chameleon';
 
 
 export function Hero() {
@@ -9,6 +10,7 @@ export function Hero() {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      trackChameleonEvent('hero_cta_clicked', { action: 'view_projects', section_id: id });
     }
   };
 
@@ -18,6 +20,7 @@ export function Hero() {
     link.href = CV;
     link.download = 'Rechidi_Ahmed_Abdelaaziz_CV.pdf';
     link.click();
+    trackChameleonEvent('cv_downloaded', { file_name: 'Rechidi_Ahmed_Abdelaaziz_CV.pdf' });
   };
 
   return (
@@ -85,6 +88,7 @@ export function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
+                onClick={() => trackChameleonEvent('social_link_clicked', { platform: 'github' })}
               >
                 <Github className="h-5 w-5" />
               </a>
@@ -95,6 +99,7 @@ export function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
+                onClick={() => trackChameleonEvent('social_link_clicked', { platform: 'linkedin' })}
               >
                 <Linkedin className="h-5 w-5" />
               </a>
@@ -103,6 +108,7 @@ export function Hero() {
               <a
                 href="mailto:ahmed.a.rechidi@gmail.com"
                 aria-label="Email"
+                onClick={() => trackChameleonEvent('social_link_clicked', { platform: 'email' })}
               >
                 <Mail className="h-5 w-5" />
               </a>

@@ -2,9 +2,52 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
+import crypto from 'node:crypto';
+
+const chameleonUidHashHandler = (url: URL, writeResponse: (statusCode: number, body: Record<string, string>) => void) => {
+  const userId = url.searchParams.get('userId');
+  const secret = process.env.CHAMELEON_VERIFICATION_SECRET;
+
+  if (!userId) {
+    writeResponse(400, { error: 'Missing userId' });
+    return;
+  }
+
+  if (!secret) {
+    writeResponse(500, { error: 'Missing CHAMELEON_VERIFICATION_SECRET' });
+    return;
+  }
+
+  const uidHash = crypto.createHmac('sha256', secret).update(userId).digest('hex');
+  writeResponse(200, { uid_hash: uidHash });
+};
+
+const chameleonUidHashPlugin = () => ({
+  name: 'chameleon-uid-hash-endpoint',
+  configureServer(server: { middlewares: { use: (path: string, handler: (req: { url?: string }, res: { statusCode: number; setHeader: (name: string, value: string) => void; end: (body: string) => void; }) => void) => void; }; }) {
+    server.middlewares.use('/api/chameleon/uid-hash', (req, res) => {
+      const requestUrl = new URL(req.url || '/', 'http://localhost');
+      chameleonUidHashHandler(requestUrl, (statusCode, body) => {
+        res.statusCode = statusCode;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(body));
+      });
+    });
+  },
+  configurePreviewServer(server: { middlewares: { use: (path: string, handler: (req: { url?: string }, res: { statusCode: number; setHeader: (name: string, value: string) => void; end: (body: string) => void; }) => void) => void; }; }) {
+    server.middlewares.use('/api/chameleon/uid-hash', (req, res) => {
+      const requestUrl = new URL(req.url || '/', 'http://localhost');
+      chameleonUidHashHandler(requestUrl, (statusCode, body) => {
+        res.statusCode = statusCode;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(body));
+      });
+    });
+  },
+});
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), chameleonUidHashPlugin()],
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     alias: {

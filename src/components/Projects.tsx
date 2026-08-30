@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { ExternalLink, Github, ChevronLeft, ChevronRight, Info, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { DeviceMockup } from './DeviceMockup';
+import { trackChameleonEvent } from '../lib/chameleon';
 
 interface Project {
   title: string;
@@ -275,14 +276,24 @@ function ProjectCard({ project, index }: ProjectCardProps) {
             <div className="flex flex-wrap gap-4">
               {project.liveUrl && (
                 <Button className="flex-1 bg-gradient-to-r from-cyan-500 to-teal-500 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 rounded-xl font-bold text-[10px] uppercase tracking-widest h-12" asChild>
-                  <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackChameleonEvent('project_live_opened', { project_title: project.title })}
+                  >
                     Live Project <ExternalLink className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
               )}
               {project.githubUrl && (
                 <Button variant="outline" className="flex-1 border-primary/20 hover:bg-primary/5 backdrop-blur-sm rounded-xl font-bold text-[10px] uppercase tracking-widest h-12" asChild>
-                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackChameleonEvent('project_source_opened', { project_title: project.title })}
+                  >
                     View Source <Github className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
@@ -294,4 +305,3 @@ function ProjectCard({ project, index }: ProjectCardProps) {
     </motion.div>
   );
 }
-
